@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "408909703991",
+    "project_id": "gen-lang-client-0660831402",
+    "storage_bucket": "gen-lang-client-0660831402.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:408909703991:android:d4f6b69a533a59571f08b2",
+        "android_client_info": {
+          "package_name": "com.tippy.odds"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "408909703991-mmei2g3tlqatfurcfqofmbhk7t8qla5a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tippy.odds",
+            "certificate_hash": "1b73751d0e8481994a70242926578c6e48cd1ff2"
+          }
+        },
+        {
+          "client_id": "408909703991-355dcu9dumn5enou0ods7nvo1ahpm7q8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzP2hHwWnqoVILxUJrrDLigSS5P-t8_xQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "408909703991-355dcu9dumn5enou0ods7nvo1ahpm7q8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

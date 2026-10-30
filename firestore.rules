@@ -1,0 +1,104 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'savdatapointsurveys@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidTip(data) {
+      return data.id is string && data.id.size() >= 1 && data.id.size() <= 100 &&
+             data.homeTeam is string && data.homeTeam.size() >= 1 && data.homeTeam.size() <= 100 &&
+             data.awayTeam is string && data.awayTeam.size() >= 1 && data.awayTeam.size() <= 100 &&
+             data.league is string && data.league.size() <= 100 &&
+             data.predictionType is string && data.predictionType.size() <= 100 &&
+             data.predictionValue is string && data.predictionValue.size() <= 100 &&
+             data.odds is string && data.odds.size() <= 20 &&
+             data.matchDate is string && data.matchDate.size() <= 50 &&
+             data.kickoffTime is string && data.kickoffTime.size() <= 20 &&
+             data.category in ['FREE', 'VIP_2_PLUS', 'VIP_5_PLUS', 'VIP_10_PLUS', 'VIP_CORRECT_SCORE'] &&
+             data.resultState in ['PENDING', 'WON', 'LOST'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 150)) &&
+             data.language is string && data.language in ['en', 'ar', 'es', 'de'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Public Tips Collection
+    match /tips/{tipId} {
+      allow get, list: if isSignedIn();
+
+      allow create: if isSignedIn() && isAdmin() &&
+                       isValidId(tipId) &&
+                       incoming().id == tipId &&
+                       incoming().keys().hasAll(['id', 'homeTeam', 'awayTeam', 'league', 'predictionType', 'predictionValue', 'odds', 'matchDate', 'kickoffTime', 'category', 'resultState', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['id', 'homeTeam', 'awayTeam', 'league', 'predictionType', 'predictionValue', 'odds', 'matchDate', 'kickoffTime', 'category', 'resultState', 'createdAt', 'updatedAt']) &&
+                       isValidTip(incoming());
+
+      allow update: if isSignedIn() && isAdmin() &&
+                       isValidId(tipId) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['resultState', 'updatedAt', 'homeTeam', 'awayTeam', 'league', 'predictionType', 'predictionValue', 'odds', 'matchDate', 'kickoffTime', 'category']) &&
+                       isValidTip(incoming());
+
+      allow delete: if isSignedIn() && isAdmin() && isValidId(tipId);
+    }
+
+    // User Profile & Preferences
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(userId) &&
+                       incoming().userId == userId &&
+                       incoming().keys().hasAll(['userId', 'language', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'email', 'language', 'createdAt', 'updatedAt']) &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email', 'language', 'updatedAt']) &&
+                       isValidUserProfile(incoming());
+
+      allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
+    }
+  }
+}

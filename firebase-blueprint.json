@@ -1,0 +1,127 @@
+{
+  "entities": {
+    "Tip": {
+      "title": "Football Prediction Tip",
+      "description": "Football match prediction record with odds, match date, kickoff time, category, and outcome result state.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the tip."
+        },
+        "homeTeam": {
+          "type": "string",
+          "description": "Home football team name."
+        },
+        "awayTeam": {
+          "type": "string",
+          "description": "Away football team name."
+        },
+        "league": {
+          "type": "string",
+          "description": "League or tournament name."
+        },
+        "predictionType": {
+          "type": "string",
+          "description": "Market prediction type (e.g. Full Time Result, Over 2.5 Goals)."
+        },
+        "predictionValue": {
+          "type": "string",
+          "description": "Specific selection value (e.g. Arsenal Win, 2 - 1)."
+        },
+        "odds": {
+          "type": "string",
+          "description": "Decimal odds format string (e.g. 1.85)."
+        },
+        "matchDate": {
+          "type": "string",
+          "description": "Match date string formatted as MMM dd, yyyy."
+        },
+        "kickoffTime": {
+          "type": "string",
+          "description": "Kickoff time string formatted as HH:mm."
+        },
+        "category": {
+          "type": "string",
+          "description": "Section category for the tip.",
+          "enum": ["FREE", "VIP_2_PLUS", "VIP_5_PLUS", "VIP_10_PLUS", "VIP_CORRECT_SCORE"]
+        },
+        "resultState": {
+          "type": "string",
+          "description": "Declared outcome of the selection.",
+          "enum": ["PENDING", "WON", "LOST"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of document creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last document update."
+        }
+      },
+      "required": [
+        "id",
+        "homeTeam",
+        "awayTeam",
+        "league",
+        "predictionType",
+        "predictionValue",
+        "odds",
+        "matchDate",
+        "kickoffTime",
+        "category",
+        "resultState",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Authenticated user profile and app preferences.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated user unique ID."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name."
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address."
+        },
+        "language": {
+          "type": "string",
+          "description": "Preferred interface language code.",
+          "enum": ["en", "ar", "es", "de"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile was last updated."
+        }
+      },
+      "required": ["userId", "language", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/tips/{tipId}": {
+      "schema": "Tip",
+      "description": "Collection of football predictions and betting tips."
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User preferences and settings."
+    }
+  }
+}
